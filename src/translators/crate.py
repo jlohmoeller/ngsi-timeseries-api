@@ -297,7 +297,7 @@ class CrateTranslator(base_translator.BaseTranslator):
         self._update_metadata_table(table_name, original_attrs)
 
         # Create Data Table
-        columns = ', '.join('{} {}'.format(cn, ct) for cn, ct in table.items())
+        columns = ', '.join('"{}" {}'.format(cn, ct) for cn, ct in table.items())
         stmt = "create table if not exists {} ({}) with " \
                "(number_of_replicas = '2-all')".format(table_name, columns)
         self.cursor.execute(stmt)
@@ -312,7 +312,7 @@ class CrateTranslator(base_translator.BaseTranslator):
 
         # Insert entities data
         p1 = table_name
-        p2 = ', '.join(col_names)
+        p2 = ', '.join(['"'+x+'"' for x in col_names])
         p3 = ','.join(['?'] * len(col_names))
         stmt = "insert into {} ({}) values ({})".format(p1, p2, p3)
         self.cursor.executemany(stmt, entries)
